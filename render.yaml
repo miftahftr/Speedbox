@@ -1,15 +1,17 @@
-# Blueprint spec version
-version: "1"
-
 services:
-  # Layanan Web untuk Aplikasi Laravel
-  - name: speedbox-web
-    type: web
-    env: php
+  # Layanan untuk Aplikasi Web Laravel Anda
+  - type: web
+    name: speedbox-web
+    runtime: php
     plan: free
-    # PENTING: Tentukan direktori publik Laravel
     rootDir: public
     healthCheckPath: /
+    buildCommand: |
+      composer install --optimize-autoloader --no-dev --no-progress
+      npm install
+      npm run build
+      php artisan migrate --force
+      php artisan optimize
     envVars:
       - key: APP_URL
         fromService:
@@ -31,23 +33,15 @@ services:
           type: redis
           name: speedbox-redis
           property: connectionString
-    buildCommand: |
-      # Perintah build yang lebih kuat dan bersih
-      composer install --optimize-autoloader --no-dev --no-progress
-      npm install
-      npm run build
-      php artisan migrate --force
-      php artisan optimize
-    # PENTING: Hapus startCommand agar Render menggunakan web server bawaannya
 
-  # Layanan Database PostgreSQL
-  - name: speedbox-db
-    type: database
+  # Layanan untuk Redis
+  - type: redis
+    name: speedbox-redis
     plan: free
+
+# Bagian KHUSUS untuk Database
+databases:
+  - name: speedbox-db
     databaseName: speedbox_db
     user: speedbox_user
-
-  # Layanan Redis
-  - name: speedbox-redis
-    type: redis
     plan: free
