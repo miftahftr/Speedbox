@@ -1,25 +1,13 @@
 services:
-  # 1. Layanan Web untuk Aplikasi Laravel
+  # Layanan Web yang dibangun dari Dockerfile
   - type: web
     name: speedbox-web
-    runtime: php
+    runtime: docker
     plan: free
-    rootDir: public
     healthCheckPath: /
-    buildCommand: |
-      composer install --optimize-autoloader --no-dev --no-progress
-      npm install
-      npm run build
-      php artisan migrate --force
-      php artisan optimize
     envVars:
       - key: APP_KEY
-        generateValue: true # Render akan otomatis membuat APP_KEY yang aman
-      - key: APP_URL
-        fromService:
-          type: web
-          name: speedbox-web
-          property: url
+        generateValue: true
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -32,18 +20,20 @@ services:
           property: connectionString
       - key: REDIS_URL
         fromService:
-          type: keyvalue # PERBAIKAN: Tipe layanan Redis yang benar
+          type: keyvalue
           name: speedbox-redis
           property: connectionString
+    # Perintah migrate sekarang dijalankan sebagai pre-deploy command
+    preDeployCommand: "php artisan migrate --force"
 
-  # 2. Layanan Redis (didefinisikan sebagai tipe 'keyvalue')
+  # Layanan Redis
   - type: keyvalue
     name: speedbox-redis
     plan: free
-    ipAllowList: [] # Membatasi akses hanya dari dalam Render
+    ipAllowList: []
 
-# Bagian KHUSUS untuk Database
 databases:
+  # Database PostgreSQL
   - name: speedbox-db
     databaseName: speedbox_db
     user: speedbox_user
