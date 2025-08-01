@@ -34,7 +34,7 @@ services:
           property: connectionString
 
   # 2. Database PostgreSQL
-  - type: psql
+  - type: postgres
     name: speedbox-db
     plan: free
     databaseName: speedbox_db
