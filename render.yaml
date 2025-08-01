@@ -7,6 +7,8 @@ services:
     type: web
     env: php
     plan: free
+    # PENTING: Tentukan direktori publik Laravel
+    rootDir: public
     healthCheckPath: /
     envVars:
       - key: APP_URL
@@ -30,22 +32,13 @@ services:
           name: speedbox-redis
           property: connectionString
     buildCommand: |
-      # 1. Hapus cache lama
-      php artisan optimize:clear
-
-      # 2. Instal dependensi PHP
-      composer install --no-dev --no-progress
-
-      # 3. Instal dependensi & build aset Frontend (CSS/JS)
+      # Perintah build yang lebih kuat dan bersih
+      composer install --optimize-autoloader --no-dev --no-progress
       npm install
       npm run build
-
-      # 4. Migrasi database & optimasi Laravel
       php artisan migrate --force
-      php artisan config:cache
-      php artisan route:cache
-      php artisan view:cache
-    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+      php artisan optimize
+    # PENTING: Hapus startCommand agar Render menggunakan web server bawaannya
 
   # Layanan Database PostgreSQL
   - name: speedbox-db
