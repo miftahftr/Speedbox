@@ -1,4 +1,9 @@
+# Blueprint spec version
+version: "1"
+
+# Definisi semua layanan
 services:
+  # 1. Layanan Web untuk Aplikasi Laravel
   - name: speedbox-web
     type: web
     env: php
@@ -26,6 +31,7 @@ services:
           name: speedbox-redis
           property: connectionString
     buildCommand: |
+      php artisan optimize:clear
       composer install --no-dev
       php artisan key:generate --force
       php artisan config:cache
@@ -33,11 +39,15 @@ services:
       php artisan view:cache
       php artisan migrate --force
     startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+
+  # 2. Layanan Database PostgreSQL
   - name: speedbox-db
     type: psql
     plan: free
     databaseName: speedbox_db
     user: speedbox_user
+
+  # 3. Layanan Redis
   - name: speedbox-redis
     type: redis
     plan: free
