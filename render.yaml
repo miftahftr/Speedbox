@@ -1,10 +1,5 @@
-# Blueprint spec version
-version: "1"
-
-# Definisi semua layanan
 services:
-  # 1. Layanan Web untuk Aplikasi Laravel
-  - name: speedbox-web # Nama layanan web Anda
+  - name: speedbox-web
     type: web
     env: php
     plan: free
@@ -19,13 +14,13 @@ services:
         value: production
       - key: APP_DEBUG
         value: false
-      - key: DB_CONNECTION # Beritahu Laravel untuk menggunakan PostgreSQL
+      - key: DB_CONNECTION
         value: pgsql
-      - key: DATABASE_URL # URL koneksi database diambil dari layanan database di bawah
+      - key: DATABASE_URL
         fromDatabase:
           name: speedbox-db
           property: connectionString
-      - key: REDIS_URL # URL koneksi Redis
+      - key: REDIS_URL
         fromService:
           type: redis
           name: speedbox-redis
@@ -38,15 +33,11 @@ services:
       php artisan view:cache
       php artisan migrate --force
     startCommand: php artisan serve --host 0.0.0.0 --port $PORT
-
-  # 2. Layanan Database PostgreSQL
-  - name: speedbox-db # Nama layanan database Anda
-    type: psql # Tipe yang benar adalah 'psql'
+  - name: speedbox-db
+    type: psql
     plan: free
     databaseName: speedbox_db
     user: speedbox_user
-
-  # 3. Layanan Redis
-  - name: speedbox-redis # Nama layanan Redis Anda
+  - name: speedbox-redis
     type: redis
     plan: free
