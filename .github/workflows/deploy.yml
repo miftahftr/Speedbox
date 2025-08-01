@@ -1,0 +1,39 @@
+name: Deploy to Production
+
+# Jalankan workflow ini setiap kali ada push ke branch 'main'
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Langkah 1: Mengambil kode dari repositori
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Langkah 2: Menjalankan perintah deploy di server via SSH
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Masuk ke direktori proyek di server
+            cd /var/www/speedbox
+
+            # Tarik perubahan terbaru dari branch main
+            git pull origin main
+
+            # Install dependensi PHP tanpa paket development
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+            # Jalankan migrasi database
+            php artisan migrate --force
+
+            # Buat ulang cache untuk optimasi
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
