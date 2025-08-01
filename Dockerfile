@@ -51,4 +51,4 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
 EXPOSE 8080
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD php artisan migrate --force && /usr/bin/supervisord -c /etc/supervisord.conf

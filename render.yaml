@@ -23,8 +23,6 @@ services:
           type: keyvalue
           name: speedbox-redis
           property: connectionString
-    # Perintah migrate sekarang dijalankan sebagai pre-deploy command
-    preDeployCommand: "php artisan migrate --force"
 
   # Layanan Redis
   - type: keyvalue
