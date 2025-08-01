@@ -42,7 +42,7 @@ services:
 
   # Layanan Database PostgreSQL
   - name: speedbox-db
-    type: psql
+    type: database
     plan: free
     databaseName: speedbox_db
     user: speedbox_user
